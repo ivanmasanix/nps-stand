@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NPS</title>
+
+  <!-- iOS Web App -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f5f5f7;
+      margin: 0;
+      padding: 24px;
+    }
+    h2 { margin-bottom: 16px; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    button {
+      width: 100%;
+      padding: 16px;
+      margin-bottom: 12px;
+      font-size: 18px;
+      border-radius: 12px;
+      border: 1px solid #ddd;
+      background: white;
+    }
+    textarea {
+      width: 100%;
+      height: 120px;
+      font-size: 16px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #ddd;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="step1" class="screen active">
+  <h2>Кто вам помогал?</h2>
+  <button onclick="setEmployee('Анна')">Анна</button>
+  <button onclick="setEmployee('Иван')">Иван</button>
+</div>
+
+<div id="step2" class="screen">
+  <h2>Оцените работу</h2>
+  <div id="scores"></div>
+</div>
+
+<div id="step3" class="screen">
+  <h2>Расскажите подробнее</h2>
+  <textarea id="comment" placeholder="Ваш отзыв"></textarea>
+  <button onclick="send()">Отправить</button>
+</div>
+
+<div id="thanks" class="screen">
+  <h2>Спасибо за отзыв 🙏</h2>
+</div>
+
+<script>
+let employee = '';
+let score = 0;
+
+const scriptURL = "https://script.google.com/macros/s/AKfycbzDLkPTd4Etrgj1a7odkFgJa-cN8pS4vsBfof9nTih6bGlvIGHZmosmDKIEg_xYKhSW/exec";
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function setEmployee(name){
+  employee = name;
+  show('step2');
+}
+
+const scores = document.getElementById('scores');
+for(let i=1;i<=10;i++){
+  const b = document.createElement('button');
+  b.textContent = i;
+  b.onclick = ()=>{ score=i; show('step3'); };
+  scores.appendChild(b);
+}
+
+function send(){
+  fetch(scriptURL, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      employee,
+      score,
+      comment: document.getElementById('comment').value
+    })
+  }).then(()=>{
+    show('thanks');
+    setTimeout(()=>location.reload(),3000);
+  }).catch(()=>{
+    alert("Ошибка отправки");
+  });
+}
+</script>
+
+</body>
+</html>
