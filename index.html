@@ -65,18 +65,9 @@
       justify-content: center;
     }
 
-    @media (max-width: 900px) {
-      .employees { grid-template-columns: repeat(3, 120px); }
-    }
-
-    @media (max-width: 600px) {
-      .employees { grid-template-columns: repeat(2, 120px); }
-    }
-
     .employee {
       text-align: center;
       color: #fff;
-      user-select: none;
     }
 
     .employee:active {
@@ -103,7 +94,6 @@
 
     .name {
       font-size: 13px;
-      font-weight: 500;
     }
 
     /* ===== ADMIN BUTTON ===== */
@@ -118,19 +108,13 @@
       color: #fff;
     }
 
-    /* ===== RATING GRID (5x2) ===== */
+    /* ===== RATING GRID ===== */
     .rating {
       display: grid;
       grid-template-columns: repeat(5, 120px);
       gap: 20px;
       justify-content: center;
       margin-top: 20px;
-    }
-
-    @media (max-width: 700px) {
-      .rating {
-        grid-template-columns: repeat(2, 120px);
-      }
     }
 
     .rating-item {
@@ -173,7 +157,17 @@
       color: #fff;
     }
 
-    /* ===== ADMIN LIST ===== */
+    .back-btn {
+      width: 100%;
+      margin-top: 12px;
+      padding: 14px;
+      font-size: 16px;
+      border-radius: 12px;
+      border: none;
+      background: rgba(255,255,255,0.85);
+    }
+
+    /* ===== ADMIN ===== */
     .admin-list label {
       display: flex;
       align-items: center;
@@ -187,14 +181,6 @@
       width: 22px;
       height: 22px;
     }
-
-    .back {
-      margin-top: 16px;
-      background: #ddd;
-      padding: 16px;
-      border-radius: 12px;
-      border: none;
-    }
   </style>
 </head>
 
@@ -202,8 +188,8 @@
 
 <!-- STEP 1 -->
 <div id="step1" class="screen active">
-  <h2>Кто из сотрудников вам помогал?</h2>
-  <div class="subtitle"></div>
+  <h2>Кто вам помогал?</h2>
+  <div class="subtitle">Нажмите на сотрудника</div>
   <div class="employees" id="employees"></div>
   <button class="admin-btn" onclick="openAdmin()">⚙️ Смена</button>
 </div>
@@ -213,6 +199,7 @@
   <h2>Оцените работу</h2>
   <div class="subtitle" id="employeeName"></div>
   <div class="rating" id="rating"></div>
+  <button class="back-btn" onclick="show('step1')">← Назад</button>
 </div>
 
 <!-- STEP 3 -->
@@ -220,6 +207,7 @@
   <h2>Комментарий</h2>
   <textarea id="comment" placeholder="Ваш отзыв"></textarea>
   <button class="send" onclick="send()">Отправить</button>
+  <button class="back-btn" onclick="show('step2')">← Назад</button>
 </div>
 
 <!-- THANK YOU -->
@@ -232,13 +220,12 @@
   <h2>Кто сегодня в смене</h2>
   <div class="admin-list" id="adminList"></div>
   <button onclick="saveToday()">Сохранить</button>
-  <button class="back" onclick="show('step1')">Назад</button>
+  <button class="back-btn" onclick="show('step1')">Назад</button>
 </div>
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzDLkPTd4Etrgj1a7odkFgJa-cN8pS4vsBfof9nTih6bGlvIGHZmosmDKIEg_xYKhSW/exec";
 
-/* ===== EMPLOYEES ===== */
 const allEmployees = [
   { name: "Эфенди", photo: "efendi.jpg" },
   { name: "Иван", photo: "ivan.jpg" },
@@ -264,7 +251,6 @@ function show(id) {
   document.getElementById(id).classList.add("active");
 }
 
-/* ===== STEP 1 ===== */
 function renderEmployees() {
   const wrap = document.getElementById("employees");
   wrap.innerHTML = "";
@@ -287,7 +273,6 @@ function selectEmployee(e) {
   show("step2");
 }
 
-/* ===== STEP 2 ===== */
 function renderRating() {
   const wrap = document.getElementById("rating");
   wrap.innerHTML = "";
@@ -305,7 +290,6 @@ function selectScore(v) {
   show("step3");
 }
 
-/* ===== STEP 3 ===== */
 function send() {
   fetch(SCRIPT_URL, {
     method: "POST",
@@ -320,7 +304,6 @@ function send() {
   setTimeout(() => location.reload(), 3000);
 }
 
-/* ===== ADMIN ===== */
 function openAdmin() {
   show("admin");
   const list = document.getElementById("adminList");
@@ -329,7 +312,7 @@ function openAdmin() {
     const checked = todayEmployees.some(t => t.name === e.name);
     list.innerHTML += `
       <label>
-        <input type="checkbox" ${checked ? "checked" : ""} value="${e.name}">
+        <input type="checkbox" ${checked ? "checked" : ""}>
         ${e.name}
       </label>
     `;
@@ -338,7 +321,7 @@ function openAdmin() {
 
 function saveToday() {
   const checked = [...document.querySelectorAll("#adminList input:checked")]
-    .map(i => i.value);
+    .map((_, i) => allEmployees[i].name);
   todayEmployees = allEmployees.filter(e => checked.includes(e.name));
   localStorage.setItem("todayEmployees", JSON.stringify(todayEmployees));
   show("step1");
