@@ -23,7 +23,7 @@
 
     .screen.active { display: block; }
 
-    /* ===== SUBTLE BACK BUTTON ===== */
+    /* BACK BUTTON */
     .back-top {
       position: absolute;
       top: 16px;
@@ -37,7 +37,7 @@
       opacity: 0.6;
     }
 
-    /* ===== FIRST SCREEN ===== */
+    /* STEP 1 */
     #step1 {
       background: url("bg.jpg") center / cover no-repeat;
     }
@@ -65,7 +65,7 @@
       margin-bottom: 20px;
     }
 
-    /* ===== EMPLOYEES GRID ===== */
+    /* EMPLOYEES */
     .employees {
       display: grid;
       grid-template-columns: repeat(4, 120px);
@@ -94,7 +94,6 @@
 
     .name { font-size: 13px; }
 
-    /* ===== ADMIN BUTTON ===== */
     .admin-btn {
       display: block;
       margin: 28px auto 0;
@@ -106,7 +105,7 @@
       color: #fff;
     }
 
-    /* ===== RATING ===== */
+    /* RATING */
     .rating {
       display: grid;
       grid-template-columns: repeat(5, 120px);
@@ -129,21 +128,23 @@
       object-fit: cover;
     }
 
-    .rating-item:active { transform: scale(0.95); }
-
-    textarea {
+    textarea, input {
       width: 100%;
-      height: 120px;
       border-radius: 12px;
       padding: 12px;
       font-size: 16px;
+      margin-top: 16px;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      height: 100px;
       resize: none;
-      margin-top: 24px;
     }
 
     .send {
       width: 100%;
-      margin-top: 16px;
+      margin-top: 20px;
       padding: 16px;
       font-size: 18px;
       border-radius: 12px;
@@ -152,13 +153,24 @@
       color: #fff;
     }
 
-    /* ===== ADMIN ===== */
-    .admin-list label {
-      display: flex;
-      align-items: center;
+    /* SOURCES */
+    .sources {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
       gap: 12px;
-      padding: 12px 0;
-      font-size: 18px;
+      margin-top: 20px;
+    }
+
+    .source-btn {
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      background: rgba(255,255,255,0.85);
+      font-size: 15px;
+    }
+
+    .source-btn.active {
+      background: #007aff;
       color: #fff;
     }
   </style>
@@ -179,8 +191,25 @@
   <button class="back-top" onclick="show('step1')">←</button>
   <h2 id="ratingTitle">Оцените работу</h2>
   <div class="rating" id="rating"></div>
-
   <textarea id="comment" placeholder="Если хотите — напишите комментарий"></textarea>
+  <button class="send" onclick="goStep3()">Далее</button>
+</div>
+
+<!-- STEP 3 -->
+<div id="step3" class="screen">
+  <button class="back-top" onclick="show('step2')">←</button>
+  <h2>Откуда вы о нас узнали?</h2>
+
+  <div class="sources">
+    <button class="source-btn" onclick="selectSource(this,'Социальные сети')">Социальные сети</button>
+    <button class="source-btn" onclick="selectSource(this,'Проходили мимо')">Проходили мимо</button>
+    <button class="source-btn" onclick="selectSource(this,'От друзей')">От друзей</button>
+    <button class="source-btn" onclick="selectSource(this,'Уже давно покупаю у вас')">
+      Уже давно покупаю у вас
+    </button>
+  </div>
+
+  <input id="phone" placeholder="Телефон для обратной связи (необязательно)">
   <button class="send" onclick="send()">Отправить</button>
 </div>
 
@@ -189,18 +218,9 @@
   <h2>Спасибо за отзыв 🙏</h2>
 </div>
 
-<!-- ADMIN -->
-<div id="admin" class="screen">
-  <button class="back-top" onclick="show('step1')">←</button>
-  <h2>Кто сегодня в смене</h2>
-  <div class="admin-list" id="adminList"></div>
-  <button class="admin-btn" onclick="saveToday()">Сохранить</button>
-</div>
-
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzDLkPTd4Etrgj1a7odkFgJa-cN8pS4vsBfof9nTih6bGlvIGHZmosmDKIEg_xYKhSW/exec";
 
-/* 🔤 СКЛОНЕНИЯ ИМЁН */
 const nameGenitive = {
   "Эфенди":"Эфенди","Иван":"Ивана","Мария":"Марии","Андрей":"Андрея",
   "Ярослав":"Ярослава","Владислав":"Владислава","Екатерина":"Екатерины",
@@ -208,7 +228,7 @@ const nameGenitive = {
   "Тамрико":"Тамрико","Роза":"Розы","Ильдар":"Ильдара"
 };
 
-const allEmployees = [
+const employees = [
   { name:"Эфенди", photo:"efendi.jpg" },
   { name:"Иван", photo:"ivan.jpg" },
   { name:"Мария", photo:"masha.jpg" },
@@ -224,23 +244,19 @@ const allEmployees = [
   { name:"Ильдар", photo:"ildar.jpg" }
 ];
 
-let todayEmployees =
-  JSON.parse(localStorage.getItem("todayEmployees")) || allEmployees;
-
 let employee = null;
 let score = 0;
+let source = "";
 
-/* ===== NAV ===== */
 function show(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
 
-/* ===== STEP 1 ===== */
 function renderEmployees() {
   const wrap = document.getElementById("employees");
   wrap.innerHTML = "";
-  todayEmployees.forEach(e => {
+  employees.forEach(e => {
     const el = document.createElement("div");
     el.className = "employee";
     el.onclick = () => selectEmployee(e);
@@ -252,33 +268,6 @@ function renderEmployees() {
   });
 }
 
-/* ===== ADMIN ===== */
-function openAdmin() {
-  show("admin");
-  const list = document.getElementById("adminList");
-  list.innerHTML = "";
-  allEmployees.forEach(e => {
-    const checked = todayEmployees.some(t => t.name === e.name);
-    list.innerHTML += `
-      <label>
-        <input type="checkbox" ${checked ? "checked" : ""} value="${e.name}">
-        ${e.name}
-      </label>
-    `;
-  });
-}
-
-function saveToday() {
-  const selected = [...document.querySelectorAll("#adminList input:checked")]
-    .map(i => i.value);
-
-  todayEmployees = allEmployees.filter(e => selected.includes(e.name));
-  localStorage.setItem("todayEmployees", JSON.stringify(todayEmployees));
-  show("step1");
-  renderEmployees();
-}
-
-/* ===== FLOW ===== */
 function selectEmployee(e) {
   employee = e;
   document.getElementById("ratingTitle").textContent =
@@ -299,16 +288,27 @@ function renderRating() {
   }
 }
 
-function send() {
+function goStep3() {
   if (!score) return;
+  show("step3");
+}
 
+function selectSource(btn, val) {
+  document.querySelectorAll(".source-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  source = val;
+}
+
+function send() {
   fetch(SCRIPT_URL, {
     method:"POST",
     mode:"no-cors",
     body: JSON.stringify({
       employee: employee.name,
       score,
-      comment: comment.value
+      comment: comment.value,
+      source,
+      phone: phone.value
     })
   });
 
