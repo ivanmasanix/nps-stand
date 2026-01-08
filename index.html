@@ -5,44 +5,133 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NPS</title>
 
-  <!-- iOS standalone -->
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #f5f5f7;
       margin: 0;
-      padding: 24px;
-      color: #111;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #000;
     }
-    h2 {
-      margin-bottom: 16px;
-    }
+
     .screen {
       display: none;
+      min-height: 100vh;
+      padding: 24px;
+      box-sizing: border-box;
     }
+
     .screen.active {
       display: block;
     }
-    button {
+
+    /* ===== FIRST SCREEN BACKGROUND ===== */
+    #step1 {
+      position: relative;
+      background: url("bg.jpg") center / cover no-repeat;
+    }
+
+    #step1::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 0;
+    }
+
+    #step1 > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    h2 {
+      text-align: center;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: rgba(255,255,255,0.85);
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    /* ===== EMPLOYEES GRID ===== */
+    .employees {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 20px;
+    }
+
+    .employee {
+      text-align: center;
+      color: #fff;
+      user-select: none;
+    }
+
+    .employee:active {
+      transform: scale(0.96);
+    }
+
+    .avatar {
+      aspect-ratio: 1 / 1;
+      border-radius: 24%;
+      overflow: hidden;
+      background: #fff;
+      box-shadow:
+        0 10px 25px rgba(0,0,0,0.4),
+        0 0 0 2px rgba(255,255,255,0.15);
+      margin-bottom: 6px;
+    }
+
+    .avatar img {
       width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .name {
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    /* ===== RATING ===== */
+    .rating {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+
+    button {
       padding: 16px;
-      margin-bottom: 12px;
       font-size: 18px;
       border-radius: 12px;
-      border: 1px solid #ddd;
+      border: none;
       background: #fff;
     }
+
     textarea {
       width: 100%;
       height: 120px;
-      font-size: 16px;
-      padding: 12px;
       border-radius: 12px;
-      border: 1px solid #ddd;
+      padding: 12px;
+      font-size: 16px;
       resize: none;
+      margin-bottom: 12px;
+    }
+
+    .send {
+      width: 100%;
+      background: #007aff;
+      color: #fff;
+    }
+
+    /* ===== ADMIN ===== */
+    .admin-list label {
+      display: block;
+      padding: 10px 0;
+      font-size: 18px;
     }
   </style>
 </head>
@@ -51,96 +140,150 @@
 
 <!-- STEP 1 -->
 <div id="step1" class="screen active">
-  <h2>Кто вам помогал?</h2>
-  <button onclick="selectEmployee('Анна')">Анна</button>
-  <button onclick="selectEmployee('Иван')">Иван</button>
-  <button onclick="selectEmployee('Мария')">Мария</button>
+  <h2 id="title">Кто вам помогал?</h2>
+  <div class="subtitle">Нажмите на сотрудника</div>
+  <div class="employees" id="employees"></div>
 </div>
 
 <!-- STEP 2 -->
 <div id="step2" class="screen">
   <h2>Оцените работу</h2>
-  <div id="rating"></div>
+  <div class="rating" id="rating"></div>
 </div>
 
 <!-- STEP 3 -->
 <div id="step3" class="screen">
-  <h2>Расскажите подробнее</h2>
+  <h2>Комментарий</h2>
   <textarea id="comment" placeholder="Ваш отзыв"></textarea>
-  <button onclick="send()">Отправить</button>
+  <button class="send" onclick="send()">Отправить</button>
 </div>
 
 <!-- THANK YOU -->
 <div id="thanks" class="screen">
-  <h2>Спасибо за ваш отзыв 🙏</h2>
+  <h2>Спасибо за отзыв 🙏</h2>
+</div>
+
+<!-- ADMIN -->
+<div id="admin" class="screen">
+  <h2>Кого сегодня оцениваем</h2>
+  <div class="admin-list" id="adminList"></div>
+  <button onclick="saveToday()">Сохранить</button>
 </div>
 
 <script>
-/* ==========================
-   CONFIG
-========================== */
+/* ===== CONFIG ===== */
 const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbzDLkPTd4Etrgj1a7odkFgJa-cN8pS4vsBfof9nTih6bGlvIGHZmosmDKIEg_xYKhSW/exec";
+"https://script.google.com/macros/s/AKfycbzDLkPTd4Etrgj1a7odkFgJa-cN8pS4vsBfof9nTih6bGlvIGHZmosmDKIEg_xYKhSW/exec";
 
-/* ==========================
-   STATE
-========================== */
+/* ===== EMPLOYEES ===== */
+const allEmployees = [
+  { name: "Эфенди", photo: "efendi.jpg" },
+  { name: "Иван", photo: "ivan.jpg" },
+  { name: "Мария", photo: "masha.jpg" },
+  { name: "Андрей", photo: "andrey.jpg" },
+  { name: "Ярослав", photo: "yaroslav.jpg" },
+  { name: "Владислав", photo: "vladislav.jpg" },
+  { name: "Екатерина", photo: "ekaterina.jpg" },
+  { name: "Тофик", photo: "tofik.jpg" },
+  { name: "Артём", photo: "artem.jpg" },
+  { name: "Михаил", photo: "misha.jpg" },
+  { name: "Тамрико", photo: "tamriko.jpg" },
+  { name: "Роза", photo: "roza.jpg" },
+  { name: "Ильдар", photo: "ildar.jpg" }
+];
+
+let todayEmployees =
+  JSON.parse(localStorage.getItem("todayEmployees")) || allEmployees;
+
 let employee = "";
 let score = 0;
 
-/* ==========================
-   UI HELPERS
-========================== */
+/* ===== HELPERS ===== */
 function show(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
 
-/* ==========================
-   STEP HANDLERS
-========================== */
+/* ===== RENDER EMPLOYEES ===== */
+function renderEmployees() {
+  const wrap = document.getElementById("employees");
+  wrap.innerHTML = "";
+  todayEmployees.forEach(e => {
+    const el = document.createElement("div");
+    el.className = "employee";
+    el.onclick = () => selectEmployee(e.name);
+    el.innerHTML = `
+      <div class="avatar"><img src="${e.photo}"></div>
+      <div class="name">${e.name}</div>
+    `;
+    wrap.appendChild(el);
+  });
+}
+
+/* ===== RATING ===== */
+const rating = document.getElementById("rating");
+for (let i = 1; i <= 10; i++) {
+  const b = document.createElement("button");
+  b.textContent = i;
+  b.onclick = () => { score = i; show("step3"); };
+  rating.appendChild(b);
+}
+
+/* ===== FLOW ===== */
 function selectEmployee(name) {
   employee = name;
   show("step2");
 }
 
-/* build rating buttons */
-const rating = document.getElementById("rating");
-for (let i = 1; i <= 10; i++) {
-  const btn = document.createElement("button");
-  btn.textContent = i;
-  btn.onclick = () => {
-    score = i;
-    show("step3");
-  };
-  rating.appendChild(btn);
-}
-
-/* ==========================
-   SEND DATA
-========================== */
 function send() {
-  const payload = {
-    employee: employee,
-    score: score,
-    comment: document.getElementById("comment").value
-  };
-
   fetch(SCRIPT_URL, {
     method: "POST",
     mode: "no-cors",
-    body: JSON.stringify(payload)
+    body: JSON.stringify({
+      employee,
+      score,
+      comment: comment.value
+    })
   });
-
   show("thanks");
-
-  /* reset for next customer */
-  setTimeout(() => {
-    location.reload();
-  }, 3000);
+  setTimeout(() => location.reload(), 3000);
 }
+
+/* ===== ADMIN (LONG PRESS) ===== */
+let pressTimer;
+const title = document.getElementById("title");
+
+title.addEventListener("touchstart", () => {
+  pressTimer = setTimeout(openAdmin, 5000);
+});
+title.addEventListener("touchend", () => clearTimeout(pressTimer));
+
+function openAdmin() {
+  show("admin");
+  const list = document.getElementById("adminList");
+  list.innerHTML = "";
+  allEmployees.forEach(e => {
+    const checked = todayEmployees.some(t => t.name === e.name);
+    list.innerHTML += `
+      <label>
+        <input type="checkbox" ${checked ? "checked" : ""} value="${e.name}">
+        ${e.name}
+      </label>
+    `;
+  });
+}
+
+function saveToday() {
+  const checked = [...document.querySelectorAll("#adminList input:checked")]
+    .map(i => i.value);
+  todayEmployees = allEmployees.filter(e => checked.includes(e.name));
+  localStorage.setItem("todayEmployees", JSON.stringify(todayEmployees));
+  location.reload();
+}
+
+/* INIT */
+renderEmployees();
 </script>
 
 </body>
 </html>
-
