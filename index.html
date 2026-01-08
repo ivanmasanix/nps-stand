@@ -54,44 +54,50 @@
       text-align: center;
       color: rgba(255,255,255,0.85);
       font-size: 14px;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
     }
 
-    /* ===== EMPLOYEES GRID (MAX 4 PER ROW) ===== */
+    /* ===== EMPLOYEES GRID (CENTERED, MAX 4) ===== */
     .employees {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(4, 120px);
       gap: 20px;
+      justify-content: center;
     }
 
     @media (max-width: 900px) {
-      .employees { grid-template-columns: repeat(3, 1fr); }
+      .employees {
+        grid-template-columns: repeat(3, 120px);
+      }
     }
 
     @media (max-width: 600px) {
-      .employees { grid-template-columns: repeat(2, 1fr); }
+      .employees {
+        grid-template-columns: repeat(2, 120px);
+      }
     }
 
-   .employee {
-  text-align: center;
-  color: #fff;
-  user-select: none;
-  max-width: 120px;     /* 👈 ограничиваем размер */
-  margin: 0 auto;
-}
+    .employee {
+      text-align: center;
+      color: #fff;
+      user-select: none;
+    }
 
-.avatar {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: 22%;
-  overflow: hidden;
-  background: #fff;
-  box-shadow:
-    0 6px 16px rgba(0,0,0,0.35),
-    0 0 0 1px rgba(255,255,255,0.15);
-  margin-bottom: 4px;
-}
+    .employee:active {
+      transform: scale(0.96);
+    }
 
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 22%;
+      overflow: hidden;
+      background: #fff;
+      box-shadow:
+        0 6px 16px rgba(0,0,0,0.35),
+        0 0 0 1px rgba(255,255,255,0.15);
+      margin-bottom: 6px;
+    }
 
     .avatar img {
       width: 100%;
@@ -100,14 +106,14 @@
     }
 
     .name {
-      font-size: 15px;
+      font-size: 13px;
       font-weight: 500;
     }
 
     /* ===== ADMIN BUTTON ===== */
     .admin-btn {
       display: block;
-      margin: 24px auto 0;
+      margin: 28px auto 0;
       padding: 8px 16px;
       font-size: 14px;
       border-radius: 20px;
