@@ -21,9 +21,7 @@
       position: relative;
     }
 
-    .screen.active {
-      display: block;
-    }
+    .screen.active { display: block; }
 
     /* ===== SUBTLE BACK BUTTON ===== */
     .back-top {
@@ -52,10 +50,7 @@
       z-index: 0;
     }
 
-    #step1 > * {
-      position: relative;
-      z-index: 1;
-    }
+    #step1 > * { position: relative; z-index: 1; }
 
     h2 {
       text-align: center;
@@ -78,11 +73,7 @@
       justify-content: center;
     }
 
-    .employee {
-      text-align: center;
-      color: #fff;
-    }
-
+    .employee { text-align: center; color: #fff; }
     .employee:active { transform: scale(0.96); }
 
     .avatar {
@@ -121,7 +112,7 @@
       grid-template-columns: repeat(5, 120px);
       gap: 20px;
       justify-content: center;
-      margin-top: 40px;
+      margin-top: 24px;
     }
 
     .rating-item {
@@ -138,13 +129,16 @@
       object-fit: cover;
     }
 
+    .rating-item:active { transform: scale(0.95); }
+
     textarea {
       width: 100%;
       height: 120px;
       border-radius: 12px;
       padding: 12px;
       font-size: 16px;
-      margin-top: 40px;
+      resize: none;
+      margin-top: 24px;
     }
 
     .send {
@@ -158,7 +152,7 @@
       color: #fff;
     }
 
-    /* ===== ADMIN LIST ===== */
+    /* ===== ADMIN ===== */
     .admin-list label {
       display: flex;
       align-items: center;
@@ -185,13 +179,8 @@
   <button class="back-top" onclick="show('step1')">←</button>
   <h2 id="ratingTitle">Оцените работу</h2>
   <div class="rating" id="rating"></div>
-</div>
 
-<!-- STEP 3 -->
-<div id="step3" class="screen">
-  <button class="back-top" onclick="show('step2')">←</button>
-  <h2>Комментарий</h2>
-  <textarea id="comment" placeholder="Ваш отзыв"></textarea>
+  <textarea id="comment" placeholder="Если хотите — напишите комментарий"></textarea>
   <button class="send" onclick="send()">Отправить</button>
 </div>
 
@@ -211,7 +200,7 @@
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzDLkPTd4Etrgj1a7odkFgJa-cN8pS4vsBfof9nTih6bGlvIGHZmosmDKIEg_xYKhSW/exec";
 
-/* 🔤 СКЛОНЕНИЯ */
+/* 🔤 СКЛОНЕНИЯ ИМЁН */
 const nameGenitive = {
   "Эфенди":"Эфенди","Иван":"Ивана","Мария":"Марии","Андрей":"Андрея",
   "Ярослав":"Ярослава","Владислав":"Владислава","Екатерина":"Екатерины",
@@ -241,6 +230,7 @@ let todayEmployees =
 let employee = null;
 let score = 0;
 
+/* ===== NAV ===== */
 function show(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
@@ -303,13 +293,15 @@ function renderRating() {
   for (let i = 1; i <= 10; i++) {
     const el = document.createElement("div");
     el.className = "rating-item";
-    el.onclick = () => { score = i; show("step3"); };
+    el.onclick = () => score = i;
     el.innerHTML = `<img src="Peak${i}.jpg">`;
     wrap.appendChild(el);
   }
 }
 
 function send() {
+  if (!score) return;
+
   fetch(SCRIPT_URL, {
     method:"POST",
     mode:"no-cors",
@@ -319,6 +311,7 @@ function send() {
       comment: comment.value
     })
   });
+
   show("thanks");
   setTimeout(() => location.reload(), 3000);
 }
