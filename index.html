@@ -57,11 +57,19 @@
       margin-bottom: 24px;
     }
 
-    /* ===== EMPLOYEES GRID ===== */
+    /* ===== EMPLOYEES GRID (MAX 4 PER ROW) ===== */
     .employees {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      grid-template-columns: repeat(4, 1fr);
       gap: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .employees { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 600px) {
+      .employees { grid-template-columns: repeat(2, 1fr); }
     }
 
     .employee {
@@ -192,6 +200,7 @@ const allEmployees = [
   { name: "Ильдар", photo: "ildar.jpg" }
 ];
 
+/* ===== STATE ===== */
 let todayEmployees =
   JSON.parse(localStorage.getItem("todayEmployees")) || allEmployees;
 
@@ -276,6 +285,7 @@ function openAdmin() {
 function saveToday() {
   const checked = [...document.querySelectorAll("#adminList input:checked")]
     .map(i => i.value);
+
   todayEmployees = allEmployees.filter(e => checked.includes(e.name));
   localStorage.setItem("todayEmployees", JSON.stringify(todayEmployees));
   location.reload();
