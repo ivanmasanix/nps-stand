@@ -149,10 +149,18 @@
 
     /* ===== ADMIN ===== */
     .admin-list label {
-      display: block;
-      padding: 10px 0;
-      font-size: 18px;
-    }
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  font-size: 18px;
+  color: #fff;              /* 👈 ВАЖНО */
+}
+
+.admin-list input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+}
 
     .back {
       margin-top: 16px;
