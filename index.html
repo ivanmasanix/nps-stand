@@ -93,7 +93,6 @@
         0 6px 16px rgba(0,0,0,0.35),
         0 0 0 1px rgba(255,255,255,0.15);
       margin-bottom: 6px;
-      position: relative;
     }
 
     .avatar img {
@@ -119,12 +118,19 @@
       color: #fff;
     }
 
-    /* ===== RATING GRID (ICONS) ===== */
+    /* ===== RATING GRID (5x2) ===== */
     .rating {
       display: grid;
       grid-template-columns: repeat(5, 120px);
       gap: 20px;
       justify-content: center;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 700px) {
+      .rating {
+        grid-template-columns: repeat(2, 120px);
+      }
     }
 
     .rating-item {
@@ -132,7 +138,6 @@
       height: 120px;
       border-radius: 22%;
       overflow: hidden;
-      position: relative;
       box-shadow:
         0 6px 16px rgba(0,0,0,0.35),
         0 0 0 1px rgba(255,255,255,0.15);
@@ -142,18 +147,6 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: brightness(0.6);
-    }
-
-    .rating-number {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 36px;
-      font-weight: 700;
-      color: #fff;
     }
 
     .rating-item:active {
@@ -245,6 +238,7 @@
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzDLkPTd4Etrgj1a7odkFgJa-cN8pS4vsBfof9nTih6bGlvIGHZmosmDKIEg_xYKhSW/exec";
 
+/* ===== EMPLOYEES ===== */
 const allEmployees = [
   { name: "Эфенди", photo: "efendi.jpg" },
   { name: "Иван", photo: "ivan.jpg" },
@@ -270,6 +264,7 @@ function show(id) {
   document.getElementById(id).classList.add("active");
 }
 
+/* ===== STEP 1 ===== */
 function renderEmployees() {
   const wrap = document.getElementById("employees");
   wrap.innerHTML = "";
@@ -292,16 +287,16 @@ function selectEmployee(e) {
   show("step2");
 }
 
+/* ===== STEP 2 ===== */
 function renderRating() {
   const wrap = document.getElementById("rating");
   wrap.innerHTML = "";
   for (let i = 1; i <= 10; i++) {
-    wrap.innerHTML += `
-      <div class="rating-item" onclick="selectScore(${i})">
-        <img src="${employee.photo}">
-        <div class="rating-number">${i}</div>
-      </div>
-    `;
+    const el = document.createElement("div");
+    el.className = "rating-item";
+    el.onclick = () => selectScore(i);
+    el.innerHTML = `<img src="Peak${i}.jpg">`;
+    wrap.appendChild(el);
   }
 }
 
@@ -310,6 +305,7 @@ function selectScore(v) {
   show("step3");
 }
 
+/* ===== STEP 3 ===== */
 function send() {
   fetch(SCRIPT_URL, {
     method: "POST",
@@ -324,6 +320,7 @@ function send() {
   setTimeout(() => location.reload(), 3000);
 }
 
+/* ===== ADMIN ===== */
 function openAdmin() {
   show("admin");
   const list = document.getElementById("adminList");
