@@ -26,7 +26,6 @@
       display: block;
     }
 
-    /* ===== BACK BUTTON ===== */
     .back-top {
       position: absolute;
       top: 16px;
@@ -44,7 +43,6 @@
       opacity: 1;
     }
 
-    /* ===== FIRST SCREEN BACKGROUND ===== */
     #step1 {
       background: url("bg.jpg") center / cover no-repeat;
     }
@@ -75,7 +73,6 @@
       margin-bottom: 20px;
     }
 
-    /* ===== EMPLOYEES GRID ===== */
     .employees {
       display: grid;
       grid-template-columns: repeat(4, 120px);
@@ -86,10 +83,6 @@
     .employee {
       text-align: center;
       color: #fff;
-    }
-
-    .employee:active {
-      transform: scale(0.96);
     }
 
     .avatar {
@@ -114,7 +107,6 @@
       font-size: 13px;
     }
 
-    /* ===== ADMIN BUTTON ===== */
     .admin-btn {
       display: block;
       margin: 28px auto 0;
@@ -126,7 +118,6 @@
       color: #fff;
     }
 
-    /* ===== RATING GRID ===== */
     .rating {
       display: grid;
       grid-template-columns: repeat(5, 120px);
@@ -149,10 +140,6 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-    }
-
-    .rating-item:active {
-      transform: scale(0.95);
     }
 
     textarea {
@@ -185,14 +172,13 @@
   <h2>Кто из сотрудников Вам помогал?</h2>
   <div class="subtitle">Выберите из ниже перечисленного списка</div>
   <div class="employees" id="employees"></div>
-  <button class="admin-btn" onclick="openAdmin()">⚙️ Смена</button>
+  <button class="admin-btn">⚙️ Смена</button>
 </div>
 
 <!-- STEP 2 -->
 <div id="step2" class="screen">
   <button class="back-top" onclick="show('step1')">←</button>
-  <h2>Оцените работу</h2>
-  <div class="subtitle" id="employeeName"></div>
+  <h2 id="ratingTitle">Оцените работу</h2>
   <div class="rating" id="rating"></div>
 </div>
 
@@ -204,7 +190,6 @@
   <button class="send" onclick="send()">Отправить</button>
 </div>
 
-<!-- THANK YOU -->
 <div id="thanks" class="screen">
   <h2>Спасибо за отзыв 🙏</h2>
 </div>
@@ -212,7 +197,24 @@
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzDLkPTd4Etrgj1a7odkFgJa-cN8pS4vsBfof9nTih6bGlvIGHZmosmDKIEg_xYKhSW/exec";
 
-const allEmployees = [
+/* 🔤 СКЛОНЕНИЯ ИМЁН (РОДИТЕЛЬНЫЙ ПАДЕЖ) */
+const nameGenitive = {
+  "Эфенди": "Эфенди",
+  "Иван": "Ивана",
+  "Мария": "Марии",
+  "Андрей": "Андрея",
+  "Ярослав": "Ярослава",
+  "Владислав": "Владислава",
+  "Екатерина": "Екатерины",
+  "Тофик": "Тофика",
+  "Артём": "Артёма",
+  "Михаил": "Михаила",
+  "Тамрико": "Тамрико",
+  "Роза": "Розы",
+  "Ильдар": "Ильдара"
+};
+
+const employees = [
   { name: "Эфенди", photo: "efendi.jpg" },
   { name: "Иван", photo: "ivan.jpg" },
   { name: "Мария", photo: "masha.jpg" },
@@ -228,7 +230,6 @@ const allEmployees = [
   { name: "Ильдар", photo: "ildar.jpg" }
 ];
 
-let todayEmployees = JSON.parse(localStorage.getItem("todayEmployees")) || allEmployees;
 let employee = null;
 let score = 0;
 
@@ -240,7 +241,7 @@ function show(id) {
 function renderEmployees() {
   const wrap = document.getElementById("employees");
   wrap.innerHTML = "";
-  todayEmployees.forEach(e => {
+  employees.forEach(e => {
     const el = document.createElement("div");
     el.className = "employee";
     el.onclick = () => selectEmployee(e);
@@ -254,7 +255,8 @@ function renderEmployees() {
 
 function selectEmployee(e) {
   employee = e;
-  document.getElementById("employeeName").textContent = e.name;
+  const gen = nameGenitive[e.name] || e.name;
+  document.getElementById("ratingTitle").textContent = `Оцените работу ${gen}`;
   renderRating();
   show("step2");
 }
@@ -265,15 +267,10 @@ function renderRating() {
   for (let i = 1; i <= 10; i++) {
     const el = document.createElement("div");
     el.className = "rating-item";
-    el.onclick = () => selectScore(i);
+    el.onclick = () => { score = i; show("step3"); };
     el.innerHTML = `<img src="Peak${i}.jpg">`;
     wrap.appendChild(el);
   }
-}
-
-function selectScore(v) {
-  score = v;
-  show("step3");
 }
 
 function send() {
