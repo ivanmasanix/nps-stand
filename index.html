@@ -1,179 +1,171 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NPS</title>
-  <meta name="apple-mobile-web-app-capable" content="yes">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NPS</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
 
-  <style>
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #000;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #000;
+}
 
-    .screen {
-      display: none;
-      min-height: 100vh;
-      padding: 24px;
-      box-sizing: border-box;
-      position: relative;
-    }
+.screen {
+  display: none;
+  min-height: 100vh;
+  padding: 24px;
+  box-sizing: border-box;
+  position: relative;
+}
 
-    .screen.active { display: block; }
+.screen.active { display: block; }
 
-    /* BACK BUTTON */
-    .back-top {
-      position: absolute;
-      top: 16px;
-      left: 16px;
-      background: rgba(255,255,255,0.25);
-      border: none;
-      color: #fff;
-      font-size: 18px;
-      padding: 6px 10px;
-      border-radius: 10px;
-      opacity: 0.6;
-    }
+/* BACK */
+.back-top {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: rgba(255,255,255,0.25);
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  opacity: .6;
+}
 
-    /* STEP 1 */
-    #step1 {
-      background: url("bg.jpg") center / cover no-repeat;
-    }
+/* STEP 1 */
+#step1 {
+  background: url("bg.jpg") center / cover no-repeat;
+}
 
-    #step1::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.55);
-      z-index: 0;
-    }
+#step1::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.55);
+}
 
-    #step1 > * { position: relative; z-index: 1; }
+#step1 > * { position:relative; z-index:1; }
 
-    h2 {
-      text-align: center;
-      color: #fff;
-      margin-bottom: 8px;
-    }
+h2 { text-align:center; color:#fff; margin-bottom:8px; }
 
-    .subtitle {
-      text-align: center;
-      color: rgba(255,255,255,0.85);
-      font-size: 14px;
-      margin-bottom: 20px;
-    }
+.subtitle {
+  text-align:center;
+  color:rgba(255,255,255,.85);
+  font-size:14px;
+  margin-bottom:20px;
+}
 
-    /* EMPLOYEES */
-    .employees {
-      display: grid;
-      grid-template-columns: repeat(4, 120px);
-      gap: 20px;
-      justify-content: center;
-    }
+/* EMPLOYEES */
+.employees {
+  display:grid;
+  grid-template-columns:repeat(4,120px);
+  gap:20px;
+  justify-content:center;
+}
 
-    .employee { text-align: center; color: #fff; }
-    .employee:active { transform: scale(0.96); }
+.employee { text-align:center; color:#fff; }
+.employee:active { transform:scale(.96); }
 
-    .avatar {
-      width: 120px;
-      height: 120px;
-      border-radius: 22%;
-      overflow: hidden;
-      background: #fff;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.35);
-      margin-bottom: 6px;
-    }
+.avatar {
+  width:120px;
+  height:120px;
+  border-radius:22%;
+  overflow:hidden;
+  background:#fff;
+  box-shadow:0 6px 16px rgba(0,0,0,.35);
+  margin-bottom:6px;
+}
 
-    .avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+.avatar img { width:100%; height:100%; object-fit:cover; }
+.name { font-size:13px; }
 
-    .name { font-size: 13px; }
+.admin-btn {
+  display:block;
+  margin:28px auto 0;
+  padding:8px 16px;
+  font-size:14px;
+  border-radius:20px;
+  border:none;
+  background:rgba(255,255,255,.18);
+  color:#fff;
+}
 
-    .admin-btn {
-      display: block;
-      margin: 28px auto 0;
-      padding: 8px 16px;
-      font-size: 14px;
-      border-radius: 20px;
-      border: none;
-      background: rgba(255,255,255,0.18);
-      color: #fff;
-    }
+/* RATING */
+.rating {
+  display:grid;
+  grid-template-columns:repeat(5,120px);
+  gap:20px;
+  justify-content:center;
+  margin-top:24px;
+}
 
-    /* RATING */
-    .rating {
-      display: grid;
-      grid-template-columns: repeat(5, 120px);
-      gap: 20px;
-      justify-content: center;
-      margin-top: 24px;
-    }
+.rating-item {
+  width:120px;
+  height:120px;
+  border-radius:22%;
+  overflow:hidden;
+  box-shadow:0 6px 16px rgba(0,0,0,.35);
+}
 
-    .rating-item {
-      width: 120px;
-      height: 120px;
-      border-radius: 22%;
-      overflow: hidden;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.35);
-    }
+.rating-item img { width:100%; height:100%; object-fit:cover; }
 
-    .rating-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+textarea, input {
+  width:100%;
+  border-radius:12px;
+  padding:12px;
+  font-size:16px;
+  margin-top:16px;
+  box-sizing:border-box;
+}
 
-    textarea, input {
-      width: 100%;
-      border-radius: 12px;
-      padding: 12px;
-      font-size: 16px;
-      margin-top: 16px;
-      box-sizing: border-box;
-    }
+textarea { height:100px; resize:none; }
 
-    textarea {
-      height: 100px;
-      resize: none;
-    }
+.send {
+  width:100%;
+  margin-top:20px;
+  padding:16px;
+  font-size:18px;
+  border-radius:12px;
+  border:none;
+  background:#007aff;
+  color:#fff;
+}
 
-    .send {
-      width: 100%;
-      margin-top: 20px;
-      padding: 16px;
-      font-size: 18px;
-      border-radius: 12px;
-      border: none;
-      background: #007aff;
-      color: #fff;
-    }
+/* SOURCES */
+.sources {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+  margin-top:20px;
+}
 
-    /* SOURCES */
-    .sources {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-top: 20px;
-    }
+.source-btn {
+  padding:14px;
+  border-radius:12px;
+  border:none;
+  background:rgba(255,255,255,.85);
+  font-size:15px;
+}
 
-    .source-btn {
-      padding: 14px;
-      border-radius: 12px;
-      border: none;
-      background: rgba(255,255,255,0.85);
-      font-size: 15px;
-    }
+.source-btn.active {
+  background:#007aff;
+  color:#fff;
+}
 
-    .source-btn.active {
-      background: #007aff;
-      color: #fff;
-    }
-  </style>
+/* ADMIN */
+.admin-list label {
+  display:flex;
+  gap:12px;
+  padding:12px 0;
+  font-size:18px;
+  color:#fff;
+}
+</style>
 </head>
 
 <body>
@@ -204,8 +196,8 @@
     <button class="source-btn" onclick="selectSource(this,'Социальные сети')">Социальные сети</button>
     <button class="source-btn" onclick="selectSource(this,'Проходили мимо')">Проходили мимо</button>
     <button class="source-btn" onclick="selectSource(this,'От друзей')">От друзей</button>
-    <button class="source-btn" onclick="selectSource(this,'Уже давно покупаю у вас')">
-      Уже давно покупаю у вас
+    <button class="source-btn" onclick="selectSource(this,'Уже являюсь вашим клиентом')">
+      Уже являюсь вашим клиентом
     </button>
   </div>
 
@@ -218,6 +210,14 @@
   <h2>Спасибо за отзыв 🙏</h2>
 </div>
 
+<!-- ADMIN -->
+<div id="admin" class="screen">
+  <button class="back-top" onclick="show('step1')">←</button>
+  <h2>Кто сегодня в смене</h2>
+  <div class="admin-list" id="adminList"></div>
+  <button class="admin-btn" onclick="saveToday()">Сохранить</button>
+</div>
+
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzDLkPTd4Etrgj1a7odkFgJa-cN8pS4vsBfof9nTih6bGlvIGHZmosmDKIEg_xYKhSW/exec";
 
@@ -228,7 +228,7 @@ const nameGenitive = {
   "Тамрико":"Тамрико","Роза":"Розы","Ильдар":"Ильдара"
 };
 
-const employees = [
+const allEmployees = [
   { name:"Эфенди", photo:"efendi.jpg" },
   { name:"Иван", photo:"ivan.jpg" },
   { name:"Мария", photo:"masha.jpg" },
@@ -244,76 +244,98 @@ const employees = [
   { name:"Ильдар", photo:"ildar.jpg" }
 ];
 
+let todayEmployees =
+  JSON.parse(localStorage.getItem("todayEmployees")) || allEmployees;
+
 let employee = null;
 let score = 0;
 let source = "";
 
-function show(id) {
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+function show(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
 
-function renderEmployees() {
-  const wrap = document.getElementById("employees");
-  wrap.innerHTML = "";
-  employees.forEach(e => {
-    const el = document.createElement("div");
-    el.className = "employee";
-    el.onclick = () => selectEmployee(e);
-    el.innerHTML = `
-      <div class="avatar"><img src="${e.photo}"></div>
-      <div class="name">${e.name}</div>
-    `;
-    wrap.appendChild(el);
+function renderEmployees(){
+  const wrap=document.getElementById("employees");
+  wrap.innerHTML="";
+  todayEmployees.forEach(e=>{
+    wrap.innerHTML+=`
+      <div class="employee" onclick='selectEmployee(${JSON.stringify(e)})'>
+        <div class="avatar"><img src="${e.photo}"></div>
+        <div class="name">${e.name}</div>
+      </div>`;
   });
 }
 
-function selectEmployee(e) {
-  employee = e;
+/* ADMIN */
+function openAdmin(){
+  show("admin");
+  const list=document.getElementById("adminList");
+  list.innerHTML="";
+  allEmployees.forEach(e=>{
+    const checked=todayEmployees.some(t=>t.name===e.name);
+    list.innerHTML+=`
+      <label>
+        <input type="checkbox" ${checked?"checked":""} value="${e.name}">
+        ${e.name}
+      </label>`;
+  });
+}
+
+function saveToday(){
+  const selected=[...document.querySelectorAll("#adminList input:checked")].map(i=>i.value);
+  todayEmployees=allEmployees.filter(e=>selected.includes(e.name));
+  localStorage.setItem("todayEmployees",JSON.stringify(todayEmployees));
+  show("step1");
+  renderEmployees();
+}
+
+/* FLOW */
+function selectEmployee(e){
+  employee=e;
   document.getElementById("ratingTitle").textContent =
     "Оцените работу " + (nameGenitive[e.name] || e.name);
   renderRating();
   show("step2");
 }
 
-function renderRating() {
-  const wrap = document.getElementById("rating");
-  wrap.innerHTML = "";
-  for (let i = 1; i <= 10; i++) {
-    const el = document.createElement("div");
-    el.className = "rating-item";
-    el.onclick = () => score = i;
-    el.innerHTML = `<img src="Peak${i}.jpg">`;
-    wrap.appendChild(el);
+function renderRating(){
+  const wrap=document.getElementById("rating");
+  wrap.innerHTML="";
+  for(let i=1;i<=10;i++){
+    wrap.innerHTML+=`
+      <div class="rating-item" onclick="score=${i}">
+        <img src="Peak${i}.jpg">
+      </div>`;
   }
 }
 
-function goStep3() {
-  if (!score) return;
+function goStep3(){
+  if(!score) return;
   show("step3");
 }
 
-function selectSource(btn, val) {
-  document.querySelectorAll(".source-btn").forEach(b => b.classList.remove("active"));
+function selectSource(btn,val){
+  document.querySelectorAll(".source-btn").forEach(b=>b.classList.remove("active"));
   btn.classList.add("active");
-  source = val;
+  source=val;
 }
 
-function send() {
-  fetch(SCRIPT_URL, {
+function send(){
+  fetch(SCRIPT_URL,{
     method:"POST",
     mode:"no-cors",
-    body: JSON.stringify({
-      employee: employee.name,
+    body:JSON.stringify({
+      employee:employee.name,
       score,
-      comment: comment.value,
+      comment:comment.value,
       source,
-      phone: phone.value
+      phone:phone.value
     })
   });
-
   show("thanks");
-  setTimeout(() => location.reload(), 3000);
+  setTimeout(()=>location.reload(),3000);
 }
 
 renderEmployees();
