@@ -57,18 +57,6 @@
       margin-bottom: 16px;
     }
 
-    /* ADMIN BUTTON */
-    .admin-btn {
-      display: block;
-      margin: 0 auto 16px;
-      padding: 6px 12px;
-      font-size: 14px;
-      border-radius: 20px;
-      border: none;
-      background: rgba(255,255,255,0.15);
-      color: #fff;
-    }
-
     /* ===== EMPLOYEES GRID (MAX 4 PER ROW) ===== */
     .employees {
       display: grid;
@@ -116,6 +104,18 @@
       font-weight: 500;
     }
 
+    /* ===== ADMIN BUTTON ===== */
+    .admin-btn {
+      display: block;
+      margin: 24px auto 0;
+      padding: 8px 16px;
+      font-size: 14px;
+      border-radius: 20px;
+      border: none;
+      background: rgba(255,255,255,0.18);
+      color: #fff;
+    }
+
     /* ===== RATING ===== */
     .rating {
       display: grid;
@@ -147,20 +147,20 @@
       color: #fff;
     }
 
-    /* ===== ADMIN ===== */
+    /* ===== ADMIN LIST ===== */
     .admin-list label {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 0;
-  font-size: 18px;
-  color: #fff;              /* 👈 ВАЖНО */
-}
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      font-size: 18px;
+      color: #fff;
+    }
 
-.admin-list input[type="checkbox"] {
-  width: 22px;
-  height: 22px;
-}
+    .admin-list input[type="checkbox"] {
+      width: 22px;
+      height: 22px;
+    }
 
     .back {
       margin-top: 16px;
@@ -175,8 +175,10 @@
 <div id="step1" class="screen active">
   <h2>Кто вам помогал?</h2>
   <div class="subtitle">Нажмите на сотрудника</div>
-  <button class="admin-btn" onclick="openAdmin()">⚙️ Смена</button>
+
   <div class="employees" id="employees"></div>
+
+  <button class="admin-btn" onclick="openAdmin()">⚙️ Смена</button>
 </div>
 
 <!-- STEP 2 -->
