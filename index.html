@@ -54,7 +54,19 @@
       text-align: center;
       color: rgba(255,255,255,0.85);
       font-size: 14px;
-      margin-bottom: 24px;
+      margin-bottom: 16px;
+    }
+
+    /* ADMIN BUTTON */
+    .admin-btn {
+      display: block;
+      margin: 0 auto 16px;
+      padding: 6px 12px;
+      font-size: 14px;
+      border-radius: 20px;
+      border: none;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
     }
 
     /* ===== EMPLOYEES GRID (MAX 4 PER ROW) ===== */
@@ -141,6 +153,11 @@
       padding: 10px 0;
       font-size: 18px;
     }
+
+    .back {
+      margin-top: 16px;
+      background: #ddd;
+    }
   </style>
 </head>
 
@@ -148,8 +165,9 @@
 
 <!-- STEP 1 -->
 <div id="step1" class="screen active">
-  <h2 id="title">Кто вам помогал?</h2>
+  <h2>Кто вам помогал?</h2>
   <div class="subtitle">Нажмите на сотрудника</div>
+  <button class="admin-btn" onclick="openAdmin()">⚙️ Смена</button>
   <div class="employees" id="employees"></div>
 </div>
 
@@ -173,9 +191,10 @@
 
 <!-- ADMIN -->
 <div id="admin" class="screen">
-  <h2>Кого сегодня оцениваем</h2>
+  <h2>Кто сегодня в смене</h2>
   <div class="admin-list" id="adminList"></div>
   <button onclick="saveToday()">Сохранить</button>
+  <button class="back" onclick="show('step1')">Назад</button>
 </div>
 
 <script>
@@ -258,15 +277,7 @@ function send() {
   setTimeout(() => location.reload(), 3000);
 }
 
-/* ===== ADMIN (LONG PRESS) ===== */
-let pressTimer;
-const title = document.getElementById("title");
-
-title.addEventListener("touchstart", () => {
-  pressTimer = setTimeout(openAdmin, 5000);
-});
-title.addEventListener("touchend", () => clearTimeout(pressTimer));
-
+/* ===== ADMIN ===== */
 function openAdmin() {
   show("admin");
   const list = document.getElementById("adminList");
@@ -288,7 +299,8 @@ function saveToday() {
 
   todayEmployees = allEmployees.filter(e => checked.includes(e.name));
   localStorage.setItem("todayEmployees", JSON.stringify(todayEmployees));
-  location.reload();
+  show("step1");
+  renderEmployees();
 }
 
 /* INIT */
