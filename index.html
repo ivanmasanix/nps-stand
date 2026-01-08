@@ -87,6 +87,7 @@ h2 {
   width:100%;
   height:100%;
   object-fit:cover;
+  pointer-events:none;
 }
 
 .name { font-size:13px; }
@@ -119,6 +120,7 @@ h2 {
   box-shadow:0 6px 16px rgba(0,0,0,.35);
   position:relative;
   transition:.15s;
+  touch-action: manipulation;
 }
 
 .rating-item::after {
@@ -229,7 +231,7 @@ textarea { height:100px; resize:none; }
 <!-- STEP 2 -->
 <div id="step2" class="screen">
   <button class="back-top" onclick="show('step1')">←</button>
-  <h2 id="ratingTitle">Оцените работу</h2>
+  <h2>Оцените работу</h2>
   <div class="rating" id="rating"></div>
   <textarea id="comment" placeholder="Если хотите — напишите комментарий"></textarea>
   <button class="send" onclick="goStep3()">Далее</button>
@@ -307,11 +309,15 @@ function renderEmployees() {
   const wrap = document.getElementById("employees");
   wrap.innerHTML = "";
   todayEmployees.forEach(e => {
-    wrap.innerHTML += `
-      <div class="employee" onclick='selectEmployee(${JSON.stringify(e)})'>
-        <div class="avatar"><img src="${e.photo}"></div>
-        <div class="name">${e.name}</div>
-      </div>`;
+    const el = document.createElement("div");
+    el.className = "employee";
+    el.innerHTML = `
+      <div class="avatar"><img src="${e.photo}"></div>
+      <div class="name">${e.name}</div>
+    `;
+    el.addEventListener("touchstart", () => selectEmployee(e), { passive:true });
+    el.addEventListener("click", () => selectEmployee(e));
+    wrap.appendChild(el);
   });
 }
 
@@ -339,7 +345,7 @@ function saveToday() {
   renderEmployees();
 }
 
-/* STEP 2 */
+/* STEP 2 – iPad FIX */
 function selectEmployee(e) {
   employee = e;
   renderRating();
@@ -349,22 +355,32 @@ function selectEmployee(e) {
 function renderRating() {
   const wrap = document.getElementById("rating");
   wrap.innerHTML = "";
+
   for (let i = 1; i <= 10; i++) {
     const item = document.createElement("div");
     item.className = "rating-item";
     item.innerHTML = `<img src="Peak${i}.jpg">`;
-    item.onclick = () => {
+
+    const handler = (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+
       if (score === i) {
         score = 0;
         document.querySelectorAll(".rating-item")
           .forEach(el => el.classList.remove("selected"));
         return;
       }
+
       score = i;
       document.querySelectorAll(".rating-item")
         .forEach(el => el.classList.remove("selected"));
       item.classList.add("selected");
     };
+
+    item.addEventListener("touchstart", handler, { passive:false });
+    item.addEventListener("click", handler);
+
     wrap.appendChild(item);
   }
 }
@@ -388,7 +404,7 @@ function send() {
     method:"POST",
     mode:"no-cors",
     body: JSON.stringify({
-      employee: employee.name,
+      employee: employee?.name || "",
       score,
       comment: comment.value,
       source,
