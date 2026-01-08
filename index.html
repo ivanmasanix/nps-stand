@@ -41,14 +41,12 @@ body {
 #step1 {
   background: url("bg.jpg") center / cover no-repeat;
 }
-
 #step1::before {
   content:"";
   position:absolute;
   inset:0;
   background:rgba(0,0,0,.55);
 }
-
 #step1 > * { position:relative; z-index:1; }
 
 h2 {
@@ -72,10 +70,7 @@ h2 {
   justify-content:center;
 }
 
-.employee {
-  text-align:center;
-  color:#fff;
-}
+.employee { text-align:center; color:#fff; }
 .employee:active { transform:scale(.96); }
 
 .avatar {
@@ -122,11 +117,10 @@ h2 {
   border-radius:22%;
   overflow:hidden;
   box-shadow:0 6px 16px rgba(0,0,0,.35);
-  position: relative;
-  transition: transform .15s ease;
+  position:relative;
+  transition:.15s;
 }
 
-/* overlay – САМЫЙ НАДЁЖНЫЙ СПОСОБ ДЛЯ iOS */
 .rating-item::after {
   content:"";
   position:absolute;
@@ -136,65 +130,66 @@ h2 {
   transition:.15s;
 }
 
-.rating-item.selected::after {
-  opacity:1;
-}
-
-.rating-item.selected {
-  transform: scale(0.96);
-}
+.rating-item.selected::after { opacity:1; }
+.rating-item.selected { transform:scale(.96); }
 
 .rating-item img {
   width:100%;
   height:100%;
   object-fit:cover;
-  pointer-events: none; /* 👈 КЛЮЧ ДЛЯ iPAD */
+  pointer-events:none;
 }
 
+/* INPUTS */
 textarea, input {
   width:100%;
-  border-radius:12px;
-  padding:12px;
+  border-radius:14px;
+  padding:14px;
   font-size:16px;
   margin-top:16px;
   box-sizing:border-box;
 }
 
-textarea {
-  height:100px;
-  resize:none;
-}
+textarea { height:100px; resize:none; }
 
 .send {
   width:100%;
   margin-top:20px;
   padding:16px;
   font-size:18px;
-  border-radius:12px;
+  border-radius:14px;
   border:none;
   background:#007aff;
   color:#fff;
 }
 
-/* SOURCES */
+/* STEP 3 – SOURCES */
 .sources {
   display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:12px;
-  margin-top:20px;
+  grid-template-columns:repeat(2,160px);
+  gap:20px;
+  justify-content:center;
+  margin-top:24px;
 }
 
-.source-btn {
-  padding:14px;
-  border-radius:12px;
-  border:none;
-  background:rgba(255,255,255,.85);
+.source-card {
+  height:90px;
+  border-radius:22%;
+  background:rgba(255,255,255,.9);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
   font-size:15px;
+  padding:12px;
+  box-shadow:0 6px 16px rgba(0,0,0,.35);
+  transition:.15s;
 }
 
-.source-btn.active {
+.source-card.selected {
   background:#007aff;
   color:#fff;
+  transform:scale(.96);
 }
 
 /* ADMIN */
@@ -246,12 +241,12 @@ textarea {
   <h2>Откуда вы о нас узнали?</h2>
 
   <div class="sources">
-    <button class="source-btn" onclick="selectSource(this,'Социальные сети')">Социальные сети</button>
-    <button class="source-btn" onclick="selectSource(this,'Проходили мимо')">Проходили мимо</button>
-    <button class="source-btn" onclick="selectSource(this,'От друзей')">От друзей</button>
-    <button class="source-btn" onclick="selectSource(this,'Уже являюсь вашим клиентом')">
+    <div class="source-card" onclick="selectSource(this,'Социальные сети')">Социальные сети</div>
+    <div class="source-card" onclick="selectSource(this,'Проходили мимо')">Проходили мимо</div>
+    <div class="source-card" onclick="selectSource(this,'От друзей')">От друзей</div>
+    <div class="source-card" onclick="selectSource(this,'Уже являюсь вашим клиентом')">
       Уже являюсь вашим клиентом
-    </button>
+    </div>
   </div>
 
   <input id="phone" placeholder="Телефон для обратной связи (необязательно)">
@@ -260,48 +255,14 @@ textarea {
 
 <!-- THANKS -->
 <div id="thanks" class="screen">
-  <h2>Спасибо за отзыв 🙏</h2>
-</div>
-
-<!-- ADMIN -->
-<div id="admin" class="screen">
-  <button class="back-top" onclick="show('step1')">←</button>
-  <h2>Кто сегодня в смене</h2>
-  <div class="admin-list" id="adminList"></div>
-  <button class="admin-btn" onclick="saveToday()">Сохранить</button>
+  <h2>Благодарим за визит</h2>
+  <p style="text-align:center; color:rgba(255,255,255,0.85); margin-top:12px;">
+    Ваше мнение очень важно для нас
+  </p>
 </div>
 
 <script>
-const SCRIPT_URL = "ВСТАВЬ_URL_APPS_SCRIPT";
-
-const nameGenitive = {
-  "Эфенди":"Эфенди","Иван":"Ивана","Мария":"Марии","Андрей":"Андрея",
-  "Ярослав":"Ярослава","Владислав":"Владислава","Екатерина":"Екатерины",
-  "Тофик":"Тофика","Артём":"Артёма","Михаил":"Михаила",
-  "Тамрико":"Тамрико","Роза":"Розы","Ильдар":"Ильдара"
-};
-
-const allEmployees = [
-  { name:"Эфенди", photo:"efendi.jpg" },
-  { name:"Иван", photo:"ivan.jpg" },
-  { name:"Мария", photo:"masha.jpg" },
-  { name:"Андрей", photo:"andrey.jpg" },
-  { name:"Ярослав", photo:"yaroslav.jpg" },
-  { name:"Владислав", photo:"vladislav.jpg" },
-  { name:"Екатерина", photo:"ekaterina.jpg" },
-  { name:"Тофик", photo:"tofik.jpg" },
-  { name:"Артём", photo:"artem.jpg" },
-  { name:"Михаил", photo:"misha.jpg" },
-  { name:"Тамрико", photo:"tamriko.jpg" },
-  { name:"Роза", photo:"roza.jpg" },
-  { name:"Ильдар", photo:"ildar.jpg" }
-];
-
-let todayEmployees =
-  JSON.parse(localStorage.getItem("todayEmployees")) || allEmployees;
-
-let employee = null;
-let score = 0;
+/* Минимальная логика для финального экрана */
 let source = "";
 
 function show(id) {
@@ -309,109 +270,12 @@ function show(id) {
   document.getElementById(id).classList.add("active");
 }
 
-/* STEP 1 */
-function renderEmployees() {
-  const wrap = document.getElementById("employees");
-  wrap.innerHTML = "";
-  todayEmployees.forEach(e => {
-    wrap.innerHTML += `
-      <div class="employee" onclick='selectEmployee(${JSON.stringify(e)})'>
-        <div class="avatar"><img src="${e.photo}"></div>
-        <div class="name">${e.name}</div>
-      </div>`;
-  });
-}
-
-/* ADMIN */
-function openAdmin() {
-  show("admin");
-  const list = document.getElementById("adminList");
-  list.innerHTML = "";
-  allEmployees.forEach(e => {
-    const checked = todayEmployees.some(t => t.name === e.name);
-    list.innerHTML += `
-      <label>
-        <input type="checkbox" ${checked ? "checked" : ""} value="${e.name}">
-        ${e.name}
-      </label>`;
-  });
-}
-
-function saveToday() {
-  const selected = [...document.querySelectorAll("#adminList input:checked")]
-    .map(i => i.value);
-  todayEmployees = allEmployees.filter(e => selected.includes(e.name));
-  localStorage.setItem("todayEmployees", JSON.stringify(todayEmployees));
-  show("step1");
-  renderEmployees();
-}
-
-/* STEP 2 */
-function selectEmployee(e) {
-  employee = e;
-  document.getElementById("ratingTitle").textContent =
-    "Оцените работу " + (nameGenitive[e.name] || e.name);
-  renderRating();
-  show("step2");
-}
-
-function renderRating() {
-  const wrap = document.getElementById("rating");
-  wrap.innerHTML = "";
-
-  for (let i = 1; i <= 10; i++) {
-    const item = document.createElement("div");
-    item.className = "rating-item";
-    item.innerHTML = `<img src="Peak${i}.jpg">`;
-
-    item.onclick = () => {
-      if (score === i) {
-        score = 0;
-        document.querySelectorAll(".rating-item")
-          .forEach(el => el.classList.remove("selected"));
-        return;
-      }
-      score = i;
-      document.querySelectorAll(".rating-item")
-        .forEach(el => el.classList.remove("selected"));
-      item.classList.add("selected");
-    };
-
-    wrap.appendChild(item);
-  }
-}
-
-function goStep3() {
-  if (!score) return;
-  show("step3");
-}
-
-/* STEP 3 */
-function selectSource(btn, val) {
-  document.querySelectorAll(".source-btn").forEach(b => b.classList.remove("active"));
-  btn.classList.add("active");
+function selectSource(el, val) {
+  document.querySelectorAll(".source-card")
+    .forEach(c => c.classList.remove("selected"));
+  el.classList.add("selected");
   source = val;
 }
-
-/* SEND */
-function send() {
-  fetch(SCRIPT_URL, {
-    method:"POST",
-    mode:"no-cors",
-    body: JSON.stringify({
-      employee: employee.name,
-      score,
-      comment: comment.value,
-      source,
-      phone: phone.value
-    })
-  });
-
-  show("thanks");
-  setTimeout(() => location.reload(), 3000);
-}
-
-renderEmployees();
 </script>
 
 </body>
