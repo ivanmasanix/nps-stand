@@ -261,21 +261,147 @@ textarea { height:100px; resize:none; }
   </p>
 </div>
 
+<!-- ADMIN -->
+<div id="admin" class="screen">
+  <button class="back-top" onclick="show('step1')">←</button>
+  <h2>Кто сегодня в смене</h2>
+  <div class="admin-list" id="adminList"></div>
+  <button class="admin-btn" onclick="saveToday()">Сохранить</button>
+</div>
+
 <script>
-/* Минимальная логика для финального экрана */
+const SCRIPT_URL = "ВСТАВЬ_URL_APPS_SCRIPT";
+
+/* СОТРУДНИКИ */
+const allEmployees = [
+  { name:"Эфенди", photo:"efendi.jpg" },
+  { name:"Иван", photo:"ivan.jpg" },
+  { name:"Мария", photo:"masha.jpg" },
+  { name:"Андрей", photo:"andrey.jpg" },
+  { name:"Ярослав", photo:"yaroslav.jpg" },
+  { name:"Владислав", photo:"vladislav.jpg" },
+  { name:"Екатерина", photo:"ekaterina.jpg" },
+  { name:"Тофик", photo:"tofik.jpg" },
+  { name:"Артём", photo:"artem.jpg" },
+  { name:"Михаил", photo:"misha.jpg" },
+  { name:"Тамрико", photo:"tamriko.jpg" },
+  { name:"Роза", photo:"roza.jpg" },
+  { name:"Ильдар", photo:"ildar.jpg" }
+];
+
+let todayEmployees =
+  JSON.parse(localStorage.getItem("todayEmployees")) || allEmployees;
+
+let employee = null;
+let score = 0;
 let source = "";
 
+/* НАВИГАЦИЯ */
 function show(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
 
+/* STEP 1 */
+function renderEmployees() {
+  const wrap = document.getElementById("employees");
+  wrap.innerHTML = "";
+  todayEmployees.forEach(e => {
+    wrap.innerHTML += `
+      <div class="employee" onclick='selectEmployee(${JSON.stringify(e)})'>
+        <div class="avatar"><img src="${e.photo}"></div>
+        <div class="name">${e.name}</div>
+      </div>`;
+  });
+}
+
+/* ADMIN */
+function openAdmin() {
+  show("admin");
+  const list = document.getElementById("adminList");
+  list.innerHTML = "";
+  allEmployees.forEach(e => {
+    const checked = todayEmployees.some(t => t.name === e.name);
+    list.innerHTML += `
+      <label>
+        <input type="checkbox" ${checked ? "checked" : ""} value="${e.name}">
+        ${e.name}
+      </label>`;
+  });
+}
+
+function saveToday() {
+  const selected = [...document.querySelectorAll("#adminList input:checked")]
+    .map(i => i.value);
+  todayEmployees = allEmployees.filter(e => selected.includes(e.name));
+  localStorage.setItem("todayEmployees", JSON.stringify(todayEmployees));
+  show("step1");
+  renderEmployees();
+}
+
+/* STEP 2 */
+function selectEmployee(e) {
+  employee = e;
+  renderRating();
+  show("step2");
+}
+
+function renderRating() {
+  const wrap = document.getElementById("rating");
+  wrap.innerHTML = "";
+  for (let i = 1; i <= 10; i++) {
+    const item = document.createElement("div");
+    item.className = "rating-item";
+    item.innerHTML = `<img src="Peak${i}.jpg">`;
+    item.onclick = () => {
+      if (score === i) {
+        score = 0;
+        document.querySelectorAll(".rating-item")
+          .forEach(el => el.classList.remove("selected"));
+        return;
+      }
+      score = i;
+      document.querySelectorAll(".rating-item")
+        .forEach(el => el.classList.remove("selected"));
+      item.classList.add("selected");
+    };
+    wrap.appendChild(item);
+  }
+}
+
+function goStep3() {
+  if (!score) return;
+  show("step3");
+}
+
+/* STEP 3 */
 function selectSource(el, val) {
   document.querySelectorAll(".source-card")
     .forEach(c => c.classList.remove("selected"));
   el.classList.add("selected");
   source = val;
 }
+
+/* SEND */
+function send() {
+  fetch(SCRIPT_URL, {
+    method:"POST",
+    mode:"no-cors",
+    body: JSON.stringify({
+      employee: employee.name,
+      score,
+      comment: comment.value,
+      source,
+      phone: phone.value
+    })
+  });
+
+  show("thanks");
+  setTimeout(() => location.reload(), 4000);
+}
+
+/* INIT */
+renderEmployees();
 </script>
 
 </body>
