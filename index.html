@@ -57,7 +57,7 @@
       margin-bottom: 20px;
     }
 
-    /* ===== EMPLOYEES GRID (CENTERED, MAX 4) ===== */
+    /* ===== EMPLOYEES GRID ===== */
     .employees {
       display: grid;
       grid-template-columns: repeat(4, 120px);
@@ -66,15 +66,11 @@
     }
 
     @media (max-width: 900px) {
-      .employees {
-        grid-template-columns: repeat(3, 120px);
-      }
+      .employees { grid-template-columns: repeat(3, 120px); }
     }
 
     @media (max-width: 600px) {
-      .employees {
-        grid-template-columns: repeat(2, 120px);
-      }
+      .employees { grid-template-columns: repeat(2, 120px); }
     }
 
     .employee {
@@ -97,6 +93,7 @@
         0 6px 16px rgba(0,0,0,0.35),
         0 0 0 1px rgba(255,255,255,0.15);
       margin-bottom: 6px;
+      position: relative;
     }
 
     .avatar img {
@@ -122,19 +119,45 @@
       color: #fff;
     }
 
-    /* ===== RATING ===== */
+    /* ===== RATING GRID (ICONS) ===== */
     .rating {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 12px;
+      grid-template-columns: repeat(5, 120px);
+      gap: 20px;
+      justify-content: center;
     }
 
-    button {
-      padding: 16px;
-      font-size: 18px;
-      border-radius: 12px;
-      border: none;
-      background: #fff;
+    .rating-item {
+      width: 120px;
+      height: 120px;
+      border-radius: 22%;
+      overflow: hidden;
+      position: relative;
+      box-shadow:
+        0 6px 16px rgba(0,0,0,0.35),
+        0 0 0 1px rgba(255,255,255,0.15);
+    }
+
+    .rating-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.6);
+    }
+
+    .rating-number {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .rating-item:active {
+      transform: scale(0.95);
     }
 
     textarea {
@@ -149,6 +172,10 @@
 
     .send {
       width: 100%;
+      padding: 16px;
+      font-size: 18px;
+      border-radius: 12px;
+      border: none;
       background: #007aff;
       color: #fff;
     }
@@ -163,7 +190,7 @@
       color: #fff;
     }
 
-    .admin-list input[type="checkbox"] {
+    .admin-list input {
       width: 22px;
       height: 22px;
     }
@@ -171,6 +198,9 @@
     .back {
       margin-top: 16px;
       background: #ddd;
+      padding: 16px;
+      border-radius: 12px;
+      border: none;
     }
   </style>
 </head>
@@ -181,15 +211,14 @@
 <div id="step1" class="screen active">
   <h2>Кто вам помогал?</h2>
   <div class="subtitle">Нажмите на сотрудника</div>
-
   <div class="employees" id="employees"></div>
-
   <button class="admin-btn" onclick="openAdmin()">⚙️ Смена</button>
 </div>
 
 <!-- STEP 2 -->
 <div id="step2" class="screen">
   <h2>Оцените работу</h2>
+  <div class="subtitle" id="employeeName"></div>
   <div class="rating" id="rating"></div>
 </div>
 
@@ -214,11 +243,8 @@
 </div>
 
 <script>
-/* ===== CONFIG ===== */
-const SCRIPT_URL =
-"https://script.google.com/macros/s/AKfycbzDLkPTd4Etrgj1a7odkFgJa-cN8pS4vsBfof9nTih6bGlvIGHZmosmDKIEg_xYKhSW/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzDLkPTd4Etrgj1a7odkFgJa-cN8pS4vsBfof9nTih6bGlvIGHZmosmDKIEg_xYKhSW/exec";
 
-/* ===== EMPLOYEES ===== */
 const allEmployees = [
   { name: "Эфенди", photo: "efendi.jpg" },
   { name: "Иван", photo: "ivan.jpg" },
@@ -235,27 +261,22 @@ const allEmployees = [
   { name: "Ильдар", photo: "ildar.jpg" }
 ];
 
-/* ===== STATE ===== */
-let todayEmployees =
-  JSON.parse(localStorage.getItem("todayEmployees")) || allEmployees;
-
-let employee = "";
+let todayEmployees = JSON.parse(localStorage.getItem("todayEmployees")) || allEmployees;
+let employee = null;
 let score = 0;
 
-/* ===== HELPERS ===== */
 function show(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
 
-/* ===== RENDER EMPLOYEES ===== */
 function renderEmployees() {
   const wrap = document.getElementById("employees");
   wrap.innerHTML = "";
   todayEmployees.forEach(e => {
     const el = document.createElement("div");
     el.className = "employee";
-    el.onclick = () => selectEmployee(e.name);
+    el.onclick = () => selectEmployee(e);
     el.innerHTML = `
       <div class="avatar"><img src="${e.photo}"></div>
       <div class="name">${e.name}</div>
@@ -264,19 +285,29 @@ function renderEmployees() {
   });
 }
 
-/* ===== RATING ===== */
-const rating = document.getElementById("rating");
-for (let i = 1; i <= 10; i++) {
-  const b = document.createElement("button");
-  b.textContent = i;
-  b.onclick = () => { score = i; show("step3"); };
-  rating.appendChild(b);
+function selectEmployee(e) {
+  employee = e;
+  document.getElementById("employeeName").textContent = e.name;
+  renderRating();
+  show("step2");
 }
 
-/* ===== FLOW ===== */
-function selectEmployee(name) {
-  employee = name;
-  show("step2");
+function renderRating() {
+  const wrap = document.getElementById("rating");
+  wrap.innerHTML = "";
+  for (let i = 1; i <= 10; i++) {
+    wrap.innerHTML += `
+      <div class="rating-item" onclick="selectScore(${i})">
+        <img src="${employee.photo}">
+        <div class="rating-number">${i}</div>
+      </div>
+    `;
+  }
+}
+
+function selectScore(v) {
+  score = v;
+  show("step3");
 }
 
 function send() {
@@ -284,7 +315,7 @@ function send() {
     method: "POST",
     mode: "no-cors",
     body: JSON.stringify({
-      employee,
+      employee: employee.name,
       score,
       comment: comment.value
     })
@@ -293,7 +324,6 @@ function send() {
   setTimeout(() => location.reload(), 3000);
 }
 
-/* ===== ADMIN ===== */
 function openAdmin() {
   show("admin");
   const list = document.getElementById("adminList");
@@ -312,14 +342,12 @@ function openAdmin() {
 function saveToday() {
   const checked = [...document.querySelectorAll("#adminList input:checked")]
     .map(i => i.value);
-
   todayEmployees = allEmployees.filter(e => checked.includes(e.name));
   localStorage.setItem("todayEmployees", JSON.stringify(todayEmployees));
   show("step1");
   renderEmployees();
 }
 
-/* INIT */
 renderEmployees();
 </script>
 
