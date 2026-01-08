@@ -72,26 +72,26 @@
       .employees { grid-template-columns: repeat(2, 1fr); }
     }
 
-    .employee {
-      text-align: center;
-      color: #fff;
-      user-select: none;
-    }
+   .employee {
+  text-align: center;
+  color: #fff;
+  user-select: none;
+  max-width: 120px;     /* 👈 ограничиваем размер */
+  margin: 0 auto;
+}
 
-    .employee:active {
-      transform: scale(0.96);
-    }
+.avatar {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 22%;
+  overflow: hidden;
+  background: #fff;
+  box-shadow:
+    0 6px 16px rgba(0,0,0,0.35),
+    0 0 0 1px rgba(255,255,255,0.15);
+  margin-bottom: 4px;
+}
 
-    .avatar {
-      aspect-ratio: 1 / 1;
-      border-radius: 24%;
-      overflow: hidden;
-      background: #fff;
-      box-shadow:
-        0 10px 25px rgba(0,0,0,0.4),
-        0 0 0 2px rgba(255,255,255,0.15);
-      margin-bottom: 6px;
-    }
 
     .avatar img {
       width: 100%;
