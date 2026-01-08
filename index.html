@@ -51,7 +51,11 @@ body {
 
 #step1 > * { position:relative; z-index:1; }
 
-h2 { text-align:center; color:#fff; margin-bottom:8px; }
+h2 {
+  text-align:center;
+  color:#fff;
+  margin-bottom:8px;
+}
 
 .subtitle {
   text-align:center;
@@ -68,7 +72,10 @@ h2 { text-align:center; color:#fff; margin-bottom:8px; }
   justify-content:center;
 }
 
-.employee { text-align:center; color:#fff; }
+.employee {
+  text-align:center;
+  color:#fff;
+}
 .employee:active { transform:scale(.96); }
 
 .avatar {
@@ -81,7 +88,12 @@ h2 { text-align:center; color:#fff; margin-bottom:8px; }
   margin-bottom:6px;
 }
 
-.avatar img { width:100%; height:100%; object-fit:cover; }
+.avatar img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
 .name { font-size:13px; }
 
 .admin-btn {
@@ -95,7 +107,7 @@ h2 { text-align:center; color:#fff; margin-bottom:8px; }
   color:#fff;
 }
 
-/* RATING */
+/* STEP 2 */
 .rating {
   display:grid;
   grid-template-columns:repeat(5,120px);
@@ -112,7 +124,11 @@ h2 { text-align:center; color:#fff; margin-bottom:8px; }
   box-shadow:0 6px 16px rgba(0,0,0,.35);
 }
 
-.rating-item img { width:100%; height:100%; object-fit:cover; }
+.rating-item img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
 
 textarea, input {
   width:100%;
@@ -123,7 +139,10 @@ textarea, input {
   box-sizing:border-box;
 }
 
-textarea { height:100px; resize:none; }
+textarea {
+  height:100px;
+  resize:none;
+}
 
 .send {
   width:100%;
@@ -158,12 +177,25 @@ textarea { height:100px; resize:none; }
 }
 
 /* ADMIN */
+.admin-list {
+  display:grid;
+  grid-template-columns:repeat(2, minmax(220px, 1fr));
+  gap:16px 32px;
+  max-width:520px;
+  margin:24px auto;
+}
+
 .admin-list label {
   display:flex;
+  align-items:center;
   gap:12px;
-  padding:12px 0;
   font-size:18px;
   color:#fff;
+}
+
+.admin-list input {
+  width:20px;
+  height:20px;
 }
 </style>
 </head>
@@ -219,7 +251,7 @@ textarea { height:100px; resize:none; }
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzDLkPTd4Etrgj1a7odkFgJa-cN8pS4vsBfof9nTih6bGlvIGHZmosmDKIEg_xYKhSW/exec";
+const SCRIPT_URL = "PASTE_YOUR_SCRIPT_URL_HERE";
 
 const nameGenitive = {
   "Эфенди":"Эфенди","Иван":"Ивана","Мария":"Марии","Андрей":"Андрея",
@@ -251,16 +283,16 @@ let employee = null;
 let score = 0;
 let source = "";
 
-function show(id){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+function show(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
 
-function renderEmployees(){
-  const wrap=document.getElementById("employees");
-  wrap.innerHTML="";
-  todayEmployees.forEach(e=>{
-    wrap.innerHTML+=`
+function renderEmployees() {
+  const wrap = document.getElementById("employees");
+  wrap.innerHTML = "";
+  todayEmployees.forEach(e => {
+    wrap.innerHTML += `
       <div class="employee" onclick='selectEmployee(${JSON.stringify(e)})'>
         <div class="avatar"><img src="${e.photo}"></div>
         <div class="name">${e.name}</div>
@@ -269,73 +301,75 @@ function renderEmployees(){
 }
 
 /* ADMIN */
-function openAdmin(){
+function openAdmin() {
   show("admin");
-  const list=document.getElementById("adminList");
-  list.innerHTML="";
-  allEmployees.forEach(e=>{
-    const checked=todayEmployees.some(t=>t.name===e.name);
-    list.innerHTML+=`
+  const list = document.getElementById("adminList");
+  list.innerHTML = "";
+  allEmployees.forEach(e => {
+    const checked = todayEmployees.some(t => t.name === e.name);
+    list.innerHTML += `
       <label>
-        <input type="checkbox" ${checked?"checked":""} value="${e.name}">
+        <input type="checkbox" value="${e.name}" ${checked ? "checked" : ""}>
         ${e.name}
       </label>`;
   });
 }
 
-function saveToday(){
-  const selected=[...document.querySelectorAll("#adminList input:checked")].map(i=>i.value);
-  todayEmployees=allEmployees.filter(e=>selected.includes(e.name));
-  localStorage.setItem("todayEmployees",JSON.stringify(todayEmployees));
+function saveToday() {
+  const selected = [...document.querySelectorAll("#adminList input:checked")]
+    .map(i => i.value);
+  todayEmployees = allEmployees.filter(e => selected.includes(e.name));
+  localStorage.setItem("todayEmployees", JSON.stringify(todayEmployees));
   show("step1");
   renderEmployees();
 }
 
 /* FLOW */
-function selectEmployee(e){
-  employee=e;
+function selectEmployee(e) {
+  employee = e;
   document.getElementById("ratingTitle").textContent =
     "Оцените работу " + (nameGenitive[e.name] || e.name);
   renderRating();
   show("step2");
 }
 
-function renderRating(){
-  const wrap=document.getElementById("rating");
-  wrap.innerHTML="";
-  for(let i=1;i<=10;i++){
-    wrap.innerHTML+=`
+function renderRating() {
+  const wrap = document.getElementById("rating");
+  wrap.innerHTML = "";
+  for (let i = 1; i <= 10; i++) {
+    wrap.innerHTML += `
       <div class="rating-item" onclick="score=${i}">
         <img src="Peak${i}.jpg">
       </div>`;
   }
 }
 
-function goStep3(){
-  if(!score) return;
+function goStep3() {
+  if (!score) return;
   show("step3");
 }
 
-function selectSource(btn,val){
-  document.querySelectorAll(".source-btn").forEach(b=>b.classList.remove("active"));
+function selectSource(btn, val) {
+  document.querySelectorAll(".source-btn").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
-  source=val;
+  source = val;
 }
 
-function send(){
-  fetch(SCRIPT_URL,{
+function send() {
+  fetch(SCRIPT_URL, {
     method:"POST",
     mode:"no-cors",
-    body:JSON.stringify({
-      employee:employee.name,
+    body: JSON.stringify({
+      employee: employee.name,
       score,
-      comment:comment.value,
+      comment: comment.value,
       source,
-      phone:phone.value
+      phone: phone.value
     })
   });
+
   show("thanks");
-  setTimeout(()=>location.reload(),3000);
+  setTimeout(() => location.reload(), 3000);
 }
 
 renderEmployees();
